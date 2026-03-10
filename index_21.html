@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>canvas | yohaann196</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f5f0e8;
+      --accent: #c8a96e;
+      --muted: #9a9080;
+      --line: rgba(13,13,13,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+      mix-blend-mode: multiply;
+    }
+    .cursor.hover {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.4;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 3rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      background: rgba(245, 240, 232, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    header span {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: clamp(5rem, 15vw, 14rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      text-align: center;
+      color: var(--ink);
+      opacity: 0;
+      transform: translateY(40px);
+      animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    .hero-sub {
+      margin-top: 2rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.7s forwards;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.2s forwards;
+    }
+
+    .scroll-hint span {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--ink), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--line);
+      margin: 0;
+    }
+
+    .gallery {
+      padding: 0;
+    }
+
+    .piece {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      border-bottom: 1px solid var(--line);
+      opacity: 0;
+      transform: translateY(60px);
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .piece.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .piece:nth-child(even) {
+      direction: rtl;
+    }
+    .piece:nth-child(even) > * {
+      direction: ltr;
+    }
+
+    .piece-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 4rem;
+      border-right: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .piece:nth-child(even) .piece-info {
+      border-right: none;
+      border-left: 1px solid var(--line);
+    }
+
+    .piece-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      margin-bottom: 2rem;
+    }
+
+    .piece-title {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .piece-desc {
+      font-size: 1.05rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 30ch;
+      margin-bottom: 3rem;
+    }
+
+    .piece-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--ink);
+      transition: color 0.2s, border-color 0.2s;
+      width: fit-content;
+    }
+
+    .piece-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .piece-link::after {
+      content: '→';
+      transition: transform 0.2s;
+    }
+
+    .piece-link:hover::after {
+      transform: translateX(4px);
+    }
+
+    .piece-preview {
+      position: relative;
+      overflow: hidden;
+      background: #e8e2d6;
+    }
+
+    .piece-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transform: scale(1.02);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+    }
+
+    .piece-preview:hover iframe {
+      transform: scale(1);
+    }
+
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      z-index: 2;
+      cursor: none;
+    }
+
+    .preview-label {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      z-index: 3;
+      background: rgba(245,240,232,0.8);
+      padding: 0.3rem 0.6rem;
+    }
+
+    footer {
+      padding: 3rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    @media (max-width: 768px) {
+      .piece {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 60vw;
+      }
+      .piece:nth-child(even) {
+        direction: ltr;
+      }
+      .piece-info {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        padding: 3rem 2rem;
+      }
+      .piece:nth-child(even) .piece-info {
+        border-left: none;
+        border-bottom: 1px solid var(--line);
+      }
+      header { padding: 1.2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <header>
+    <h1>Canvas</h1>
+    <span>yohaann196 | creative works</span>
+  </header>
+
+  <section class="hero">
+    <h2 class="hero-title">a r t</h2>
+    <p class="hero-sub">my interactive static HTML pieces and works.</p>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="gallery">
+
+    <article class="piece" id="piece-1">
+      <div class="piece-info">
+        <p class="piece-num">001 / 002</p>
+        <h2 class="piece-title">Koi Pond</h2>
+        <p class="piece-desc">A serene, interactive web experience where virtual fish swim around and follow your cursor's movements. Users can interact with the environment by clicking to create water ripples and dragging floating lily pads across the surface.</p>
+        <a class="piece-link" href="https://yohaann196.github.io/koipond" target="_blank">Open piece</a>
+      </div>
+      <div class="piece-preview">
+        <div class="preview-overlay"></div>
+        <iframe src="https://yohaann196.github.io/koipond" title="Koi Pond" loading="lazy"></iframe>
+        <span class="preview-label">Live preview</span>
+      </div>
+    </article>
+
+    <article class="piece" id="piece-2">
+      <div class="piece-info">
+        <p class="piece-num">002 / 002</p>
+        <h2 class="piece-title">Sketch</h2>
+        <p class="piece-desc">A dynamic, interactive digital canvas that lets users generate vibrant visual bursts of particles and confetti. It features keyboard controls to pause the animation, swap color palettes, and clear the screen.</p>
+        <a class="piece-link" href="https://yohaann196.github.io/sketch" target="_blank">Open piece</a>
+      </div>
+      <div class="piece-preview">
+        <div class="preview-overlay"></div>
+        <iframe src="https://yohaann196.github.io/sketch" title="Sketch" loading="lazy"></iframe>
+        <span class="preview-label">Live preview</span>
+      </div>
+    </article>
+
+  </section>
+
+  <footer>
+    <p>© 2026 yohaann196</p>
+    <p>Canvas | creative works</p>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    const hoverTargets = document.querySelectorAll('a, .piece-preview');
+    hoverTargets.forEach(target => {
+      target.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      target.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.piece').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
