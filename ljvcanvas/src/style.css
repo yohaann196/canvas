@@ -1,0 +1,28 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --sidebar-w: 280px;
+  --white:        #ffffff;
+  --off:          #f8f8f8;
+  --border:       #e0e0e0;
+  --text:         #1a1a1a;
+  --muted:        #888888;
+  --accent:       #2d7dd2;
+  --accent-light: #e8f2fc;
+  --red:          #e53935;
+  --radius:       6px;
+  --font:         'Fira Code', monospace;
+}
+
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: #f0f0f0;
+}
