@@ -34,6 +34,14 @@ npm run build
 
 The output goes to `dist/` and can be hosted on GitHub Pages, Netlify, or any static host.
 
+To deploy to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+This builds the project and publishes the `dist/` folder to the `gh-pages` branch. The site will be live at `https://yohaann196.github.io/canvas/`.
+
 ---
 
 ## Controls
