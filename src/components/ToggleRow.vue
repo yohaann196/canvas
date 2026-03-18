@@ -28,7 +28,7 @@ defineEmits(['update:modelValue'])
 .switch {
   width: 34px; height: 18px;
   border-radius: 9px;
-  background: var(--border);
+  background: #333;
   position: relative;
   cursor: pointer;
   transition: background .2s;
@@ -41,8 +41,8 @@ defineEmits(['update:modelValue'])
   top: 2px; left: 2px;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  background: #e2e2e2;
+  box-shadow: 0 1px 2px rgba(0,0,0,.4);
   transition: left .2s;
 }
 .switch.on::after { left: 18px; }

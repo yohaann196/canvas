@@ -1,6 +1,6 @@
 # ljvcanvas
 
-A Lissajous figure "toy"
+A Lissajous figure toy built as a single HTML file. No dependencies, no build step — just open it in a browser.
 
 ---
 
@@ -20,8 +20,8 @@ The ratio `a:b` determines the shape. The phase offset `δ` rotates and morphs i
 ## Usage
 
 ```bash
-git clone https://github.com/yohaann196/ljvcanvas
-cd ljvcanvas
+git clone https://github.com/yohaann196/canvas
+cd canvas
 npm install
 npm run dev
 ```
@@ -107,7 +107,5 @@ src/
 
 ## Browser support
 
-Works in all modern browsers (Chrome, Firefox, Safari, Edge). Uses Canvas 2D API only.
+Works in all modern browsers (Chrome, Firefox, Safari, Edge). Uses Canvas 2D API only — no WebGL, no frameworks.
 
-- (this readme is my projected goals, some edits are still private so how the project looks in the readme might be different from how the code looks on Github.)
-- (this repo used to be random HTML art that I did when i was bored but i pivoted to an Lissajous curve visualizer cus its p cool)
