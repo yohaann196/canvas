@@ -1,17 +1,19 @@
 <template>
   <div class="app">
     <Sidebar
-      :params="canvas?.params"
-      :running="canvas?.running"
-      :delta-label="canvas?.deltaLabel"
-      @toggle-play="canvas?.togglePlay()"
-      @clear="canvas?.clear()"
-      @export="canvas?.exportPng()"
-      @set-fx="canvas?.setFx($event)"
-      @set-fy="canvas?.setFy($event)"
-      @set-delta="canvas?.setDelta($event)"
-      @set-preset="canvas?.applyPreset($event)"
+      v-if="canvas"
+      :params="canvas.params"
+      :running="canvas.running"
+      :delta-label="canvas.deltaLabel"
+      @toggle-play="canvas.togglePlay()"
+      @clear="canvas.clear()"
+      @export="canvas.exportPng()"
+      @set-fx="canvas.setFx($event)"
+      @set-fy="canvas.setFy($event)"
+      @set-delta="canvas.setDelta($event)"
+      @set-preset="canvas.applyPreset($event)"
     />
+    <aside v-else class="sidebar-placeholder" />
     <LissajousCanvas ref="canvas" />
   </div>
 </template>
@@ -43,5 +45,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 .app {
   display: flex;
   height: 100vh;
+}
+
+.sidebar-placeholder {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
 }
 </style>

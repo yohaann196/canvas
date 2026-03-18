@@ -5,15 +5,16 @@
 }
 
 :root {
-  --sidebar-w: 280px;
-  --white:        #ffffff;
-  --off:          #f8f8f8;
-  --border:       #e0e0e0;
-  --text:         #1a1a1a;
-  --muted:        #888888;
-  --accent:       #2d7dd2;
-  --accent-light: #e8f2fc;
-  --red:          #e53935;
+  --sidebar-w:    280px;
+  --sidebar-bg:   #141414;
+  --sidebar-border: #2a2a2a;
+  --section-bg:   #1a1a1a;
+  --input-bg:     #1f1f1f;
+  --text:         #e2e2e2;
+  --muted:        #666666;
+  --accent:       #4a9eff;
+  --accent-dim:   rgba(74,158,255,0.15);
+  --red:          #ff5252;
   --radius:       6px;
   --font:         'Fira Code', monospace;
 }
@@ -24,5 +25,5 @@ html, body, #app {
   font-family: var(--font);
   font-size: 13px;
   color: var(--text);
-  background: #f0f0f0;
+  background: #0d0d0d;
 }

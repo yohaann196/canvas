@@ -126,7 +126,7 @@ const props = defineProps({
   deltaLabel: { type: String, required: true },
 })
 
-const emit = defineEmits(['toggle-play', 'clear', 'export', 'set-fx', 'set-fy', 'set-delta'])
+const emit = defineEmits(['toggle-play', 'clear', 'export', 'set-fx', 'set-fy', 'set-delta', 'set-preset'])
 
 const presetKeys = Object.keys(PRESETS)
 const activePreset = ref('3:2')
@@ -149,16 +149,12 @@ const colorModes = {
 }
 </script>
 
-<script>
-export default { emits: ['set-preset'] }
-</script>
-
 <style scoped>
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
-  background: var(--white);
-  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -167,7 +163,7 @@ export default { emits: ['set-preset'] }
 
 .sidebar-header {
   padding: 14px 16px 13px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--sidebar-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -178,6 +174,7 @@ export default { emits: ['set-preset'] }
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
+  color: var(--text);
 }
 .logo span { color: var(--accent); }
 
@@ -186,27 +183,27 @@ export default { emits: ['set-preset'] }
 .icon-btn {
   width: 28px; height: 28px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--white);
+  border: 1px solid var(--sidebar-border);
+  background: var(--input-bg);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  transition: background .12s, border-color .12s;
+  transition: background .12s, border-color .12s, color .12s;
   color: var(--muted);
   font-size: 12px;
   font-family: var(--font);
 }
-.icon-btn:hover  { background: var(--off); border-color: #bbb; color: var(--text); }
+.icon-btn:hover  { background: #2a2a2a; border-color: #444; color: var(--text); }
 .icon-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 .sidebar-body {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #ddd transparent;
+  scrollbar-color: #333 transparent;
 }
 
 .section {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--sidebar-border);
   padding: 12px 16px;
 }
 
@@ -220,8 +217,8 @@ export default { emits: ['set-preset'] }
 }
 
 .formula-box {
-  background: var(--off);
-  border: 1px solid var(--border);
+  background: var(--input-bg);
+  border: 1px solid var(--sidebar-border);
   border-radius: var(--radius);
   padding: 10px 12px;
   line-height: 2;
@@ -238,15 +235,16 @@ export default { emits: ['set-preset'] }
 
 .num-ctrl {
   display: flex; align-items: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--sidebar-border);
   border-radius: var(--radius);
   overflow: hidden;
   flex: 1;
+  background: var(--input-bg);
 }
 .num-ctrl button {
   width: 26px; height: 28px;
   border: none;
-  background: var(--off);
+  background: transparent;
   color: var(--muted);
   font-size: 14px;
   cursor: pointer;
@@ -255,11 +253,12 @@ export default { emits: ['set-preset'] }
   font-family: var(--font);
   display: flex; align-items: center; justify-content: center;
 }
-.num-ctrl button:hover { background: var(--border); color: var(--text); }
+.num-ctrl button:hover { background: #2a2a2a; color: var(--text); }
 .num-val {
   flex: 1; text-align: center;
   font-size: 13px; font-weight: 500;
   font-family: var(--font);
+  color: var(--text);
 }
 
 .color-row { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -268,10 +267,12 @@ export default { emits: ['set-preset'] }
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform .12s, border-color .12s;
+  transition: transform .12s, box-shadow .12s;
 }
 .color-chip:hover { transform: scale(1.15); }
-.color-chip.on { border-color: var(--text); }
+.color-chip.on {
+  box-shadow: 0 0 0 2px var(--sidebar-bg), 0 0 0 4px var(--text);
+}
 
 .chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .chip {
@@ -279,18 +280,18 @@ export default { emits: ['set-preset'] }
   font-size: 11px;
   padding: 4px 10px;
   border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--white);
+  border: 1px solid var(--sidebar-border);
+  background: var(--input-bg);
   color: var(--muted);
   cursor: pointer;
   transition: all .12s;
 }
-.chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 .sidebar-footer {
   padding: 10px 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--sidebar-border);
   display: flex; gap: 6px;
   flex-shrink: 0;
 }
@@ -298,8 +299,8 @@ export default { emits: ['set-preset'] }
 .btn {
   flex: 1; height: 32px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--white);
+  border: 1px solid var(--sidebar-border);
+  background: var(--input-bg);
   font-family: var(--font);
   font-size: 11.5px;
   letter-spacing: 0.03em;
@@ -307,9 +308,10 @@ export default { emits: ['set-preset'] }
   cursor: pointer;
   transition: all .12s;
 }
-.btn:hover  { background: var(--off); border-color: #bbb; }
+.btn:hover  { background: #2a2a2a; border-color: #444; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
-.btn.primary:hover { background: #2266bb; }
+.btn.primary:hover { background: #3a8aef; border-color: #3a8aef; }
 .btn.danger  { color: var(--red); }
-.btn.danger:hover { background: #ffeaea; border-color: var(--red); }
+.btn.danger:hover { background: rgba(255,82,82,0.12); border-color: var(--red); }
 </style>
+

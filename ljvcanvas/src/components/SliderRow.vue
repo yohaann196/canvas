@@ -45,7 +45,7 @@ defineEmits(['update:modelValue'])
 input[type=range] {
   -webkit-appearance: none;
   width: 100%; height: 4px;
-  background: var(--border);
+  background: #333;
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -55,16 +55,16 @@ input[type=range]::-webkit-slider-thumb {
   width: 14px; height: 14px;
   border-radius: 50%;
   background: var(--accent);
-  border: 2px solid white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 2px solid #141414;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   cursor: pointer;
 }
 input[type=range]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 4px var(--accent-light);
+  box-shadow: 0 0 0 4px var(--accent-dim);
 }
 
 .sl-val {
-  width: 32px;
+  width: 36px;
   text-align: right;
   font-size: 12px;
   color: var(--text);
